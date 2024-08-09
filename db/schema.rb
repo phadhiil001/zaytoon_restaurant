@@ -121,7 +121,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_23_203526) do
     t.string "email"
     t.string "address"
     t.string "stripe_payment_id"
-    t.string "stripe_charge_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
