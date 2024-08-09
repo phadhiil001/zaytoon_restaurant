@@ -1,3 +1,7 @@
 web: bin/rails server
 css: bin/rails tailwindcss:watch
+<<<<<<< HEAD
 
+=======
+web: bundle exec rails server -p $PORT
+>>>>>>> refs/remotes/origin/main
