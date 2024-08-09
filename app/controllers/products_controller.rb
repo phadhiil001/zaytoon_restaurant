@@ -1,49 +1,30 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[show edit update destroy]
-
   def index
     @products = Product.all
+
+    if params[:search].present?
+      @products = @products.where('products.name LIKE ? OR products.description LIKE ?', "%#{params[:search]}%", "%#{params[:search]}%")
+    end
+
+    if params[:category].present?
+      @products = @products.joins(:category).where(categories: { id: params[:category] })
+    end
+
+    if params[:filter].present?
+      case params[:filter]
+      when 'on_sale'
+        @products = @products.on_sale
+      when 'new'
+        @products = @products.new_products
+      when 'recently_updated'
+        @products = @products.recently_updated
+      end
+    end
+
+    @products = @products.page(params[:page]).per(20)
   end
 
   def show
-  end
-
-  def new
-    @product = Product.new
-  end
-
-  def edit
-  end
-
-  def create
-    @product = Product.new(product_params)
-    if @product.save
-      redirect_to @product, notice: 'Product was successfully created.'
-    else
-      render :new
-    end
-  end
-
-  def update
-    if @product.update(product_params)
-      redirect_to @product, notice: 'Product was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
-  def destroy
-    @product.destroy
-    redirect_to products_url, notice: 'Product was successfully destroyed.'
-  end
-
-  private
-
-  def set_product
     @product = Product.find(params[:id])
-  end
-
-  def product_params
-    params.require(:product).permit(:name, :description, :price)
   end
 end

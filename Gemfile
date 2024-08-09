@@ -69,8 +69,18 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "activeadmin", "~> 3.2"
-
 gem "devise", "~> 4.9"
 
+gem "activeadmin", "~> 3.2"
+
+gem "kaminari", "~> 1.2"
+
 gem "sassc-rails", "~> 2.1"
+
+gem "mini_magick", "~> 4.13"
+
+gem "ransack", "~> 4.1"
+
+gem 'font-awesome-sass', '~> 5.15'
+
+gem "stripe", "~> 12.2"
