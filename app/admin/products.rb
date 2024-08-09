@@ -1,41 +1,24 @@
 ActiveAdmin.register Product do
+  permit_params :name, :description, :price, :category_id, images: [], options: []
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :name, :description, :price
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:name, :description, :price]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-  #
-
-  permit_params :name, :description, :price, images: []
+  filter :name
+  filter :category
+  filter :price
+  filter :created_at
 
   form do |f|
-    f.inputs do
+    f.semantic_errors *f.object.errors
+
+    f.inputs "Product Details" do
       f.input :name
       f.input :description
       f.input :price
-      # f.input :images, as: :file, input_html: { multiple: true }
+      f.input :category
+      f.input :images, as: :file, input_html: { multiple: true }
+      f.input :options, as: :text, input_html: { value: f.object.options.join(", ") }, hint: "Separate options with commas"
     end
-    f.actions
-  end
 
-  index do
-    selectable_column
-    id_column
-    column :name
-    column :description
-    column :price
-    column :created_at
-    actions
+    f.actions
   end
 
   show do
@@ -43,19 +26,30 @@ ActiveAdmin.register Product do
       row :name
       row :description
       row :price
+      row :category
       row :created_at
       row :updated_at
-      # row :images do |product|
-      #   ul do
-      #     product.images.each do |img|
-      #       li do
-      #         image_tag url_for(img)
-      #       end
-      #     end
-      #   end
-      # end
+      row "Images" do |product|
+        ul do
+          product.images.each do |image|
+            li do
+              image_tag url_for(image), size: "100x100"
+            end
+          end
+        end
+      end
+      row :options do |product|
+        product.options.join(", ")
+      end
     end
-    active_admin_comments
   end
 
+  controller do
+    def update
+      if params[:product][:options].is_a?(String)
+        params[:product][:options] = params[:product][:options].split(",").map(&:strip)
+      end
+      super
+    end
+  end
 end

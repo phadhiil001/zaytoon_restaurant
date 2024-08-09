@@ -1,13 +1,38 @@
 Rails.application.routes.draw do
-  resources :products
+  devise_for :users, controllers: {
+    registrations: 'users/registrations'
+  }
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  root 'home#index'
+
+  get '/about', to: 'static_pages#about'
+  get '/contact', to: 'contact#new'
+  post '/contact', to: 'contact#create'
+
+  resources :categories, only: [:index, :show]
+  resources :products, only: [:index, :show]
+  resources :orders, only: [:new, :create, :show, :destroy] do
+    collection do
+      get 'past_orders'
+      get 'current_order'
+    end
+
+    member do
+      get 'invoice', to: 'orders#invoice'
+      post 'create_checkout_session', to: 'orders#create_checkout_session'
+      post 'checkout', to: 'orders#checkout'
+      get 'success', to: 'orders#success'
+      get 'cancel', to: 'orders#cancel'
+      patch 'update_item/:item_id', to: 'orders#update_item', as: 'update_item'
+      delete 'remove_item/:item_id', to: 'orders#remove_item', as: 'remove_item'
+      post 'add_item', to: 'orders#add_item', as: 'add_item'
+    end
+  end
+
+  get 'cart', to: 'orders#current_order', as: 'cart'
+
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Defines the root path route ("/")
-  root "products#index"
 end
+
